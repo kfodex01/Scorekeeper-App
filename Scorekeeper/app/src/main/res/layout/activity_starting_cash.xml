@@ -8,5 +8,5 @@
 
     <include layout="@layout/content_starting_cash"
         android:id="@+id/include" />
-    
+
 </android.support.constraint.ConstraintLayout>
