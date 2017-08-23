@@ -2,4 +2,5 @@
     <string name="app_name">Scorekeeper</string>
     <string name="welcome">Welcome to Scorekeeper!</string>
     <string name="instructions_start">Please enter your starting cash on the line provided:</string>
+    <string name="title_activity_main">Cash on Hand</string>
 </resources>
