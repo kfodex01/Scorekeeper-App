@@ -13,6 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="top|center_horizontal"
-        android:text="Enter transaction amount:" />
+        android:text="@string/transaction_message"
+        android:labelFor="@+id/transaction_amount"/>
+
+    <EditText
+        android:id="@id/transaction_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/commit_transaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/commit" />
 
 </LinearLayout>

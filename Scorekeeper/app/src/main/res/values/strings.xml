@@ -3,4 +3,9 @@
     <string name="welcome">Welcome to Scorekeeper!</string>
     <string name="instructions_start">Please enter your starting cash on the line provided:</string>
     <string name="title_activity_main">Cash on Hand</string>
+    <string name="commit">Commit</string>
+    <string name="transaction_message">Enter transaction amount:</string>
+    <string name="default_cash">$0</string>
+    <string name="income">Income</string>
+    <string name="payout">Payout</string>
 </resources>
