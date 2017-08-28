@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class StartingCash extends AppCompatActivity {
@@ -18,13 +18,13 @@ public class StartingCash extends AppCompatActivity {
         Button commit = (Button) findViewById(R.id.commit_start);
         commit.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                TextView startingCash = (TextView) findViewById(R.id.starting_cash);
+                EditText etStartingCash = (EditText) findViewById(R.id.starting_cash);
 
                 // if the line is blank, makes starting cash zero.
                 long cash = 0;
-                if(startingCash.getText().length() != 0){
+                if(etStartingCash.getText().length() != 0){
                     try {
-                        cash = Long.parseLong(startingCash.getText().toString());
+                        cash = Long.parseLong(etStartingCash.getText().toString());
                     }
                     catch (NumberFormatException e)
                     {
