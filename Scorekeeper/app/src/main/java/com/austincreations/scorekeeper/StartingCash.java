@@ -1,6 +1,8 @@
 package com.austincreations.scorekeeper;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,12 +10,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import static com.austincreations.scorekeeper.R.string.commit;
+
 public class StartingCash extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_starting_cash);
+
+        Cursor cursor = getContentResolver().query(TransactionProvider.CONTENT_URI, DBOpenHelper.TRANS_ALL_COLUMNS,
+                null, null, null);
+        if(cursor != null && cursor.getCount() > 0){
+            goToMainScreen();
+        }
 
         Button commit = (Button) findViewById(R.id.commit_start);
         commit.setOnClickListener(new View.OnClickListener(){
@@ -32,11 +42,27 @@ public class StartingCash extends AppCompatActivity {
                         return;
                     }
                 }
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                i.putExtra("cash", cash);
-                startActivity(i);
+                addTransaction(cash);
+                goToMainScreen();
+
             }
         });
 
+    }
+
+    private void addTransaction(long cash) {
+
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.TRANS_ID, 1);
+        values.put(DBOpenHelper.TRANS_TYPE, DBOpenHelper.TRANS_INCOME);
+        values.put(DBOpenHelper.TRANS_AMOUNT, cash);
+        getContentResolver().insert(TransactionProvider.CONTENT_URI, values);
+        setResult(RESULT_OK);
+
+    }
+
+    private void goToMainScreen() {
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
     }
 }

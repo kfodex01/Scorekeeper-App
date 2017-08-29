@@ -15,7 +15,7 @@ import android.support.annotation.Nullable;
 
 public class TransactionProvider extends ContentProvider {
 
-    private static final String AUTHORITY = "com.austincreations.scorekeeper";
+    private static final String AUTHORITY = "com.austincreations.scorekeeper.TransactionProvider";
     private static final String BASE_PATH = "trans";
     public static final Uri CONTENT_URI =
             Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
@@ -51,7 +51,7 @@ public class TransactionProvider extends ContentProvider {
         }
 
         return database.query(DBOpenHelper.TABLE_TRANS, DBOpenHelper.TRANS_ALL_COLUMNS,
-                selection, null, null, null, DBOpenHelper.TRANS_ID + " DESC");
+                selection, null, null, null, DBOpenHelper.TRANS_ID + " ASC");
     }
 
     @Nullable
