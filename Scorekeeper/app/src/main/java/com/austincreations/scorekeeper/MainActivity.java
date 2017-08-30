@@ -1,19 +1,27 @@
 package com.austincreations.scorekeeper;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private TextView tvCash;
     private long cash = 0;
+    private static final int EDITOR_REQUEST_CODE = 5;
+    private CursorAdapter cursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,12 +30,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //totals up the cash
-        sumTransactions();
+        cursorAdapter = new TransactionCursorAdapter(this, null, 0);
+        ListView list = (ListView) findViewById(android.R.id.list);
+        list.setAdapter(cursorAdapter);
 
-        // fills in the cash total
+        getLoaderManager().initLoader(0, null, this);
+
+        //totals up the cash
         tvCash = (TextView) findViewById(R.id.cash);
-        tvCash.setText("$" + cash);
+        sumTransactions();
 
         // sets event handlers for buttons
         Button bnIncome = (Button) findViewById(R.id.income);
@@ -36,16 +47,35 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v){
                 Intent i = new Intent(getApplicationContext(), TransactionActivity.class);
                 i.putExtra("willAdd", true);
-                startActivity(i);
+                startActivityForResult(i, EDITOR_REQUEST_CODE);
             }
         });
         bnPayout.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent i = new Intent(getApplicationContext(), TransactionActivity.class);
                 i.putExtra("willAdd", false);
-                startActivity(i);
+                startActivityForResult(i, EDITOR_REQUEST_CODE);
             }
         });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == R.id.action_new_game) {
+            getContentResolver().delete(TransactionProvider.CONTENT_URI, null, null);
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
 
     }
 
@@ -56,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sumTransactions(){
 
+        cash = 0;
         Cursor cursor = getContentResolver().query(TransactionProvider.CONTENT_URI, DBOpenHelper.TRANS_ALL_COLUMNS,
                 null, null, null);
         if(cursor != null && cursor.getCount() > 0)
@@ -82,5 +113,39 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // fills in the cash total
+        tvCash.setText("$" + cash);
+
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new android.content.CursorLoader(this, TransactionProvider.CONTENT_URI,
+                null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        cursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        cursorAdapter.swapCursor(null);
+        sumTransactions();
+    }
+
+    private Loader<Cursor> restartLoader() {
+        sumTransactions();
+        return getLoaderManager().restartLoader(0, null, this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        sumTransactions();
+        if (requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK){
+            restartLoader();
+        }
+    }
+
 }
