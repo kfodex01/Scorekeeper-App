@@ -4,6 +4,7 @@ import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,7 +20,6 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private TextView tvCash;
-    private long cash = 0;
     private static final int EDITOR_REQUEST_CODE = 5;
     private CursorAdapter cursorAdapter;
 
@@ -56,7 +57,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivityForResult(i, EDITOR_REQUEST_CODE);
             }
         });
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(MainActivity.this, TransactionActivity.class);
+                Uri uri = Uri.parse(TransactionProvider.CONTENT_URI + "/" + id);
+                i.putExtra(TransactionProvider.CONTENT_ITEM_TYPE, uri);
+                i.putExtra(DBOpenHelper.TRANS_ID, (int)id);
+                startActivityForResult(i, EDITOR_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
@@ -81,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void sumTransactions(){
 
-        cash = 0;
+        long cash = 0;
         Cursor cursor = getContentResolver().query(TransactionProvider.CONTENT_URI, DBOpenHelper.TRANS_ALL_COLUMNS,
                 null, null, null);
         if(cursor != null && cursor.getCount() > 0)
@@ -110,7 +121,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         // fills in the cash total
-        tvCash.setText("$" + cash);
+        String text = "$" + cash;
+        tvCash.setText(text);
 
     }
 
