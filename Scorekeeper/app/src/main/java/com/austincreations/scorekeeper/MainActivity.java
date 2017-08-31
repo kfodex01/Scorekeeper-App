@@ -30,13 +30,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // gets all the transactions and displays them below the buttons
         cursorAdapter = new TransactionCursorAdapter(this, null, 0);
         ListView list = (ListView) findViewById(android.R.id.list);
         list.setAdapter(cursorAdapter);
-
         getLoaderManager().initLoader(0, null, this);
 
-        //totals up the cash
+        // totals up the cash
         tvCash = (TextView) findViewById(R.id.cash);
         sumTransactions();
 
@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivityForResult(i, EDITOR_REQUEST_CODE);
             }
         });
+
+        // sets event handlers for transaction clicks
         list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
             @Override
@@ -81,15 +83,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         int id = item.getItemId();
         if (id == R.id.action_new_game) {
+
+            // clears database for a new game
             getContentResolver().delete(TransactionProvider.CONTENT_URI, null, null);
             finish();
+
         }
 
         return super.onOptionsItemSelected(item);
 
     }
 
-
+    // totals transactions and displays the total in the cash view
     private void sumTransactions(){
 
         long cash = 0;

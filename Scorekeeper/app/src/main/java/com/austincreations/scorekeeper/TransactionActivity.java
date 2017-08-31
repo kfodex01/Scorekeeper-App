@@ -6,23 +6,18 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static com.austincreations.scorekeeper.R.id.cash;
-
 public class TransactionActivity extends AppCompatActivity {
 
     private boolean willAdd;
-    private Button bnCommit;
     private EditText etAmount;
     private long amount = 0;
     private int trans_id;
-    private Uri uri;
     private String action;
     private String transFilter;
 
@@ -33,7 +28,7 @@ public class TransactionActivity extends AppCompatActivity {
 
         etAmount = (EditText) findViewById(R.id.transaction_amount);
         Intent i = getIntent();
-        uri = i.getParcelableExtra(TransactionProvider.CONTENT_ITEM_TYPE);
+        Uri uri = i.getParcelableExtra(TransactionProvider.CONTENT_ITEM_TYPE);
         trans_id = i.getIntExtra(DBOpenHelper.TRANS_ID, -1);
         if(trans_id == -1) {
             action = Intent.ACTION_INSERT;
@@ -62,10 +57,15 @@ public class TransactionActivity extends AppCompatActivity {
             setTitle("Edit Transaction");
             transFilter = DBOpenHelper.TRANS_ID + "=" + uri.getLastPathSegment();
             Cursor cursor = getContentResolver().query(uri, DBOpenHelper.TRANS_ALL_COLUMNS, transFilter, null, null);
-            cursor.moveToFirst();
-            long oldAmount = cursor.getLong(cursor.getColumnIndex(DBOpenHelper.TRANS_AMOUNT));
-            etAmount.setText("" + oldAmount);
-            String type = cursor.getString(cursor.getColumnIndex(DBOpenHelper.TRANS_TYPE));
+            String type = "";
+            if(cursor != null) {
+                cursor.moveToFirst();
+                long oldAmount = cursor.getLong(cursor.getColumnIndex(DBOpenHelper.TRANS_AMOUNT));
+                String amountText = "" + oldAmount;
+                etAmount.setText(amountText);
+                type = cursor.getString(cursor.getColumnIndex(DBOpenHelper.TRANS_TYPE));
+                cursor.close();
+            }
             TextView tvInstructions = (TextView) findViewById(R.id.tv_transaction_message);
             if (type.equals(DBOpenHelper.TRANS_INCOME)){
                 willAdd = true;
@@ -76,7 +76,7 @@ public class TransactionActivity extends AppCompatActivity {
             }
         }
 
-        bnCommit = (Button) findViewById(R.id.commit_transaction);
+        Button bnCommit = (Button) findViewById(R.id.commit_transaction);
         bnCommit.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 if(etAmount.getText().length() != 0){

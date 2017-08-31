@@ -8,12 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-/**
- * Created by Kevin on 8/30/2017.
- */
+class TransactionCursorAdapter extends CursorAdapter {
 
-public class TransactionCursorAdapter extends CursorAdapter {
-    public TransactionCursorAdapter(Context context, Cursor c, int flags) {
+    TransactionCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
