@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,31 +78,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
-    @Override
-    public void onBackPressed(){
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if (id == R.id.action_new_game) {
-            getContentResolver().delete(TransactionProvider.CONTENT_URI, null, null);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-
-    }
-
-            private void sumTransactions(){
+    private void sumTransactions(){
 
         cash = 0;
         Cursor cursor = getContentResolver().query(TransactionProvider.CONTENT_URI, DBOpenHelper.TRANS_ALL_COLUMNS,
@@ -130,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     cash -= amount;
                 }
             }
+            cursor.close();
         }
 
         // fills in the cash total
