@@ -4,14 +4,15 @@ import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,7 +20,6 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private TextView tvCash;
-    private long cash = 0;
     private static final int EDITOR_REQUEST_CODE = 5;
     private CursorAdapter cursorAdapter;
 
@@ -30,13 +30,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // gets all the transactions and displays them below the buttons
         cursorAdapter = new TransactionCursorAdapter(this, null, 0);
         ListView list = (ListView) findViewById(android.R.id.list);
         list.setAdapter(cursorAdapter);
-
         getLoaderManager().initLoader(0, null, this);
 
-        //totals up the cash
+        // totals up the cash
         tvCash = (TextView) findViewById(R.id.cash);
         sumTransactions();
 
@@ -58,6 +58,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        // sets event handlers for transaction clicks
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(MainActivity.this, TransactionActivity.class);
+                Uri uri = Uri.parse(TransactionProvider.CONTENT_URI + "/" + id);
+                i.putExtra(TransactionProvider.CONTENT_ITEM_TYPE, uri);
+                i.putExtra(DBOpenHelper.TRANS_ID, (int)id);
+                startActivityForResult(i, EDITOR_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
@@ -71,41 +83,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         int id = item.getItemId();
         if (id == R.id.action_new_game) {
+
+            // clears database for a new game
             getContentResolver().delete(TransactionProvider.CONTENT_URI, null, null);
             finish();
+
         }
 
         return super.onOptionsItemSelected(item);
 
     }
 
-    @Override
-    public void onBackPressed(){
+    // totals transactions and displays the total in the cash view
+    private void sumTransactions(){
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if (id == R.id.action_new_game) {
-            getContentResolver().delete(TransactionProvider.CONTENT_URI, null, null);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-
-    }
-
-            private void sumTransactions(){
-
-        cash = 0;
+        long cash = 0;
         Cursor cursor = getContentResolver().query(TransactionProvider.CONTENT_URI, DBOpenHelper.TRANS_ALL_COLUMNS,
                 null, null, null);
         if(cursor != null && cursor.getCount() > 0)
@@ -130,10 +122,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     cash -= amount;
                 }
             }
+            cursor.close();
         }
 
         // fills in the cash total
-        tvCash.setText("$" + cash);
+        String text = "$" + cash;
+        tvCash.setText(text);
 
     }
 

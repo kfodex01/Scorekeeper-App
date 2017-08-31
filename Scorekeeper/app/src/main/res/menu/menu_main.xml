@@ -7,3 +7,4 @@
         android:orderInCategory="100"
         android:title="New Game"
         app:showAsAction="never" />
+</menu>

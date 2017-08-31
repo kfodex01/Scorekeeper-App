@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import static com.austincreations.scorekeeper.R.string.commit;
-
 public class StartingCash extends AppCompatActivity {
 
     @Override
@@ -19,10 +17,12 @@ public class StartingCash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_starting_cash);
 
+        // skips this screen if there are already transactions in the database
         Cursor cursor = getContentResolver().query(TransactionProvider.CONTENT_URI, DBOpenHelper.TRANS_ALL_COLUMNS,
                 null, null, null);
         if(cursor != null && cursor.getCount() > 0){
             goToMainScreen();
+            cursor.close();
         }
 
         Button commit = (Button) findViewById(R.id.commit_start);
@@ -30,7 +30,7 @@ public class StartingCash extends AppCompatActivity {
             public void onClick(View v){
                 EditText etStartingCash = (EditText) findViewById(R.id.starting_cash);
 
-                // if the line is blank, makes starting cash zero.
+                // if the line is blank, makes starting cash zero. Also checks that the number is a valid long.
                 long cash = 0;
                 if(etStartingCash.getText().length() != 0){
                     try {
@@ -50,6 +50,7 @@ public class StartingCash extends AppCompatActivity {
 
     }
 
+    // sets the initial transaction for this game
     private void addTransaction(long cash) {
 
         ContentValues values = new ContentValues();
@@ -61,6 +62,7 @@ public class StartingCash extends AppCompatActivity {
 
     }
 
+    // starts the main activity
     private void goToMainScreen() {
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(i);

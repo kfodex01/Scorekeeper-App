@@ -4,29 +4,26 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Created by Kevin on 8/29/2017.
- */
+class DBOpenHelper extends SQLiteOpenHelper {
 
-public class DBOpenHelper extends SQLiteOpenHelper {
-
-    public static final String DB_NAME = "score.db";
-    public static final int DB_VERSION = 1;
+    // database variables
+    private static final String DB_NAME = "score.db";
+    private static final int DB_VERSION = 1;
 
     // for transaction table
-    public static final String TABLE_TRANS = "transactions";
-    public static final String TRANS_ID = "_id";
-    public static final String TRANS_TYPE = "type";
-    public static final String TRANS_AMOUNT = "amount";
-    public static final String[] TRANS_ALL_COLUMNS = {TRANS_ID, TRANS_TYPE, TRANS_AMOUNT};
+    static final String TABLE_TRANS = "transactions";
+    static final String TRANS_ID = "_id";
+    static final String TRANS_TYPE = "type";
+    static final String TRANS_AMOUNT = "amount";
+    static final String[] TRANS_ALL_COLUMNS = {TRANS_ID, TRANS_TYPE, TRANS_AMOUNT};
     private static final String TRANS_TABLE_CREATE = "CREATE TABLE " + TABLE_TRANS + " (" +
             TRANS_ID + " INTEGER PRIMARY KEY, " + TRANS_TYPE + " TEXT, " + TRANS_AMOUNT + " INTEGER)";
 
     // constants to seperate income from payouts
-    public static final String TRANS_PAYOUT = "Payout";
-    public static final String TRANS_INCOME = "Income";
+    static final String TRANS_PAYOUT = "Payout";
+    static final String TRANS_INCOME = "Income";
 
-    public DBOpenHelper(Context context) {
+    DBOpenHelper(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
 
@@ -46,7 +43,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    public void clearTable(SQLiteDatabase db){
+    private void clearTable(SQLiteDatabase db){
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANS);
         onCreate(db);
